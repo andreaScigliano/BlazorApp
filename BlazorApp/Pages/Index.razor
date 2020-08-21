@@ -1,0 +1,50 @@
+﻿@page "/"
+@inject CounterStore counterStore
+@inject StringStore stringStore
+@inject IActionDispatcher actionDispacher
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+<p>Current count: @counterStore.GetState().Count current string: @stringStore.GetState().Text</p>
+<input @bind-value="@n" />
+<button class="btn btn-primary" @onclick="SetCount">Click me</button>
+<input @bind-value="@s" />
+<button class="btn btn-primary" @onclick="SetString">Click me</button>
+
+@code {
+    private int n = 10;
+    private string s = "";
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        counterStore.AddStateChangeListeners(UpdateView);
+        stringStore.AddStateChangeListeners(UpdateView);
+    }
+
+    private void UpdateView()
+    {
+        StateHasChanged();
+    }
+
+    private void SetCount()
+    {
+        StateHasChanged();
+        actionDispacher.Dispatch(new SetCountAction(n));
+    }
+
+    private void SetString()
+    {
+        StateHasChanged();
+        actionDispacher.Dispatch(new SetStringAction(s));
+    }
+
+    public void Dispose()
+    {
+        counterStore.RemoveStateChangeListeners(UpdateView);
+        stringStore.RemoveStateChangeListeners(UpdateView);
+    }
+}
+}
